@@ -1,0 +1,135 @@
+
+
+
+import pandas as pd
+import numpy as np
+import sklearn.metrics as sm
+import sklearn
+import matplotlib.pyplot as plt
+import nltk
+
+from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+from sklearn.datasets import load_digits
+from sklearn.preprocessing import scale
+from sklearn.preprocessing import normalize
+from sklearn import metrics
+from sklearn.decomposition import PCA
+from sklearn.decomposition import TruncatedSVD
+
+
+K=20
+
+
+
+
+
+from matplotlib.tri import (
+    Triangulation, UniformTriRefiner, CubicTriInterpolator)
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import numpy as np
+
+import sklearn as sk
+
+#Chargement des données
+from sklearn.datasets import fetch_20newsgroups
+newsgroups_train = fetch_20newsgroups(subset='train')
+
+
+
+b= len(newsgroups_train.data)
+
+#Je devrai remplacer la ligne suivante par a=b mais le problème c'est que mon compilateur n'est pas assez puissant.
+a= 100
+print(b)
+df = []
+for i in range(a):
+  df.append(newsgroups_train.data[i])
+  
+
+#Vectorisation de texte
+from sklearn.feature_extraction.text import CountVectorizer
+
+corpus = df
+vectorizer = CountVectorizer()
+X = vectorizer.fit_transform(corpus)
+vectorizer.get_feature_names_out()
+X=X.toarray()
+
+
+#ACP
+from sklearn.decomposition import PCA
+
+mypca = PCA(n_components=2) # On paramètre ici pour ne garder que 2 composantes
+
+# Modèle d'ACP
+
+mypca.fit(X)
+
+
+
+# Résultats de l'ACP
+
+data_sortie= mypca.fit_transform(X)
+
+
+
+# Création d'un graphique des deux composantes principales
+plt.scatter(data_sortie[:, 0], data_sortie[:, 1])
+plt.xlabel('Composante Principale 1')
+plt.ylabel('Composante Principale 2')
+plt.title('ACP - Composantes Principales')
+plt.show()
+
+
+
+model = KMeans(n_clusters=K, n_init=10)
+y_pred = model.fit_predict(X)
+
+
+centroids = model.cluster_centers_
+unique_labels = np.unique(y_pred)
+
+
+# Plot 2D result
+fig = plt.figure(1, figsize=(15, 8))
+for i in unique_labels:
+    plt.scatter(X[y_pred == i , 0] , X[y_pred == i , 1] , label=i)
+plt.scatter(centroids[:,0] , centroids[:,1] , s=80, color='k')
+plt.legend()
+plt.show()
+
+
+# Je ne comprend pas pourquoi mon compilateur ne m'affiche pas les bonnes couleurs.
+
+
+
+
+
+from sklearn.metrics import silhouette_score, homogeneity_score, completeness_score, v_measure_score
+
+# Score de silhouette
+silhouette = silhouette_score(X, y_pred)
+print("Silhouette Score:", silhouette)
+
+# Pureté, exhaustivité et mesure V
+purity = homogeneity_score(newsgroups_train.target, y_pred)
+completeness = completeness_score(newsgroups_train.target, y_pred)
+v_measure = v_measure_score(newsgroups_train.target, y_pred)
+
+print("Purity:", purity)
+print("Completeness:", completeness)
+print("V-Measure:", v_measure)
+
+
+
+
+
+
+
+
+
+
+
