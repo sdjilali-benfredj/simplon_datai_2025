@@ -1,6 +1,3 @@
-
-
-
 import pandas as pd
 import numpy as np
 import sklearn.metrics as sm
@@ -19,7 +16,7 @@ from sklearn.decomposition import PCA
 from sklearn.decomposition import TruncatedSVD
 
 
-K=20
+
 
 
 
@@ -35,29 +32,44 @@ import sklearn as sk
 
 #Chargement des données
 from sklearn.datasets import fetch_20newsgroups
-newsgroups_train = fetch_20newsgroups(subset='train')
 
-
+newsgroups_train = fetch_20newsgroups(subset='train', remove=('headers', 'footers', 'quotes'))
 
 b= len(newsgroups_train.data)
 
-#Je devrai remplacer la ligne suivante par a=b mais le problème c'est que mon compilateur n'est pas assez puissant.
-a= 100
+a=b
 print(b)
 df = []
 for i in range(a):
   df.append(newsgroups_train.data[i])
-  
+
+
+
+
+
+
+
 
 #Vectorisation de texte
 from sklearn.feature_extraction.text import CountVectorizer
 
 corpus = df
-vectorizer = CountVectorizer()
+vectorizer = CountVectorizer( max_features=5000)
 X = vectorizer.fit_transform(corpus)
 vectorizer.get_feature_names_out()
 X=X.toarray()
 
+
+
+# K-mean clustring
+
+K=20
+model = KMeans(n_clusters=K, n_init=10)
+y_pred = model.fit_predict(X)
+
+
+centroids = model.cluster_centers_
+unique_labels = np.unique(y_pred)
 
 #ACP
 from sklearn.decomposition import PCA
@@ -85,12 +97,8 @@ plt.show()
 
 
 
-model = KMeans(n_clusters=K, n_init=10)
-y_pred = model.fit_predict(X)
 
 
-centroids = model.cluster_centers_
-unique_labels = np.unique(y_pred)
 
 
 # Plot 2D result
@@ -100,9 +108,6 @@ for i in unique_labels:
 plt.scatter(centroids[:,0] , centroids[:,1] , s=80, color='k')
 plt.legend()
 plt.show()
-
-
-# Je ne comprend pas pourquoi mon compilateur ne m'affiche pas les bonnes couleurs.
 
 
 
@@ -131,5 +136,36 @@ print("V-Measure:", v_measure)
 
 
 
+
+
+
+
+
+
+
+
+
+# Liste des noms des groupes
+group_names = newsgroups_train.target_names
+
+
+# Obtenir les étiquettes de groupe pour chaque élément dans le dataset
+labels = newsgroups_train.target
+print(labels)
+
+
+# Afficher les positions des éléments pour chaque groupe
+for i in range(20):
+  XX=X[labels==i]
+  plt.scatter(XX[:,0], XX[:,1], label=2)
+  plt.scatter(X[y_pred == i , 0] , X[y_pred == i , 1] , label=1)
+  plt.xlabel('Composante Principale 1')
+  plt.ylabel('Composante Principale 2')
+  plt.title('ACP - Composantes Principales')
+  plt.show()
+
+
+
+#Le clustering ne permet pas de retrouver les etiquettes d'orignie.
 
 
